@@ -1,10 +1,10 @@
 import sys
 
-from functionModule import runProcessingNativeIntersect, getGeoJsonFromFeaturesOfOutput, exitCall
+from functionModule import runProcessingQgisClip, getGeoJsonFromFeaturesOfOutput, exitCall
 
 
 def execute(firstGeoJsonFile, SeconGeoJsonFile):
-    ats = runProcessingNativeIntersect(firstGeoJsonFile, SeconGeoJsonFile)
+    ats = runProcessingQgisClip(firstGeoJsonFile, SeconGeoJsonFile)
     getGeoJsonFromFeaturesOfOutput(ats)
 
 

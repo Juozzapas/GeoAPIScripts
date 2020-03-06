@@ -1,6 +1,7 @@
-from qgis.core import *
-import sys
 import json
+import sys
+
+from qgis.core import QgsApplication, QgsJsonExporter, QgsVectorLayer, QgsCoordinateReferenceSystem
 
 # Supply path to qgis install location
 QgsApplication.setPrefixPath('C:/OSGEO4W1/apps/qgis', True)
@@ -15,11 +16,23 @@ sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
 from qgis.analysis import QgsNativeAlgorithms
 import processing
 from processing.core.Processing import Processing
+from tempfile import TemporaryFile
+
 Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 
+
 # Write your code here to load some layers, use processing
 # algorithms, etc.
+
+def getLayersFromFile(path):
+    with open(path) as myFile:
+        text = myFile.read()
+    result = text.split('?')
+    for m in result:
+        TemporaryFile()
+    return "layerlList"
+
 
 def execute():
     if len(sys.argv) == 3:
@@ -67,11 +80,13 @@ def isInt(object):
     except ValueError:
         return False
 
+
 def getGeoJsonFromFeaturesOfOutput(output):
     layer = output['OUTPUT']
     features = layer.getFeatures()
     exporter = QgsJsonExporter()
     print("GEOJSON", exporter.exportFeatures(features))
+
 
 def getGeoJsonFromSelectedFeaturesInLayer(layer):
     features = layer.selectedFeatures()
@@ -79,8 +94,15 @@ def getGeoJsonFromSelectedFeaturesInLayer(layer):
     print("GEOJSON", exporter.exportFeatures(features))
 
 
+def getGeoJsonFromFeaturesInLayer(layer):
+    features = layer.getFeatures()
+    exporter = QgsJsonExporter()
+    print("GEOJSON", exporter.exportFeatures(features))
+
+
 def getLayerFromFile(path):
     return QgsVectorLayer(path, "mygeojson", "ogr")
+
 
 def isDistanceValid(distance):
     if (isInt(distance) and int(distance) > 0):
@@ -88,13 +110,50 @@ def isDistanceValid(distance):
     else:
         return False
 
+
 def exitCall():
     qgs.exitQgis()
-def runProcessingQgisSelectByAttribute(input,field,operator,value):
-    processing.algorithmHelp("qgis:selectbyattribute")
+
+
+def runProcessingQgisSelectByAttribute(input, field, operator, value):
     return processing.run("qgis:selectbyattribute",
-                   {'INPUT': input,
-                    'FIELD': field,
-                    'OPERATOR': operator,
-                    'VALUE': value,
-                    'METHOD': 0})
+                          {'INPUT': input,
+                           'FIELD': field,
+                           'OPERATOR': operator,
+                           'VALUE': value,
+                           'METHOD': 0})
+
+
+def checkIfCrsValid(crs):
+    try:
+        QgsCrs = QgsCoordinateReferenceSystem(crs)
+        if QgsCrs.isValid():
+            return True
+        else:
+            return False
+    except:
+        print("An exception occurred")
+        return False
+
+
+def runProcessingMergeVectorLayers(layerList, crs='None'):
+    return processing.run("native:mergevectorlayers",
+                          {'LAYERS': layerList,
+                           'CRS': crs,
+                           'OUTPUT': 'TEMPORARY_OUTPUT'})
+
+
+def getQgsVectorLayerArray(objectArray):
+    vectorArray = []
+    for object in objectArray:
+        tempJsonObject = json.dumps(object)
+        tempLayer = QgsVectorLayer(tempJsonObject, "mygeojson", "ogr")
+        vectorArray.append(tempLayer)
+    return vectorArray
+
+
+def runProcessingQgisClip(inputLayer, overlayLayer):
+    return processing.run("native:clip",
+                          {'INPUT': inputLayer,
+                           'OVERLAY': overlayLayer,
+                           'OUTPUT': 'TEMPORARY_OUTPUT'})

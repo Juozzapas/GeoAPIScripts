@@ -1,21 +1,25 @@
 import sys
-from functionModule import getLayerFromFile, getGeoJsonFromSelectedFeaturesInLayer,exitCall,runProcessingNativeBuffer,isDistanceValid,runProcessingNativeSelectByLocation
 
-def execute(firstGeoJsonFile,SeconGeoJsonFile,predicate,distance):
-    if len(sys.argv) == 5:
-        layer = getLayerFromFile(firstGeoJsonFile)
-        if(isDistanceValid(distance)):
-            runProcessingNativeSelectByLocation(layer, bufferedLayer(SeconGeoJsonFile,distance), predicate)
-        else:
-            runProcessingNativeSelectByLocation(layer, SeconGeoJsonFile)
-        getGeoJsonFromSelectedFeaturesInLayer(layer)
+from functionModule import getLayerFromFile, getGeoJsonFromSelectedFeaturesInLayer, exitCall, runProcessingNativeBuffer, \
+    isDistanceValid, runProcessingNativeSelectByLocation
+
+
+def execute(firstGeoJsonFile, SeconGeoJsonFile, predicate, distance):
+    layer = getLayerFromFile(firstGeoJsonFile)
+    if (isDistanceValid(distance)):
+        runProcessingNativeSelectByLocation(layer, bufferedLayer(SeconGeoJsonFile, distance), predicate)
     else:
-        print("wrong parameters", len(sys.argv))
+        runProcessingNativeSelectByLocation(layer, SeconGeoJsonFile)
+    getGeoJsonFromSelectedFeaturesInLayer(layer)
 
 
-def bufferedLayer(pathToLayer,distance):
+def bufferedLayer(pathToLayer, distance):
     buffer = runProcessingNativeBuffer(pathToLayer, distance)
     return buffer['OUTPUT']
 
-execute(sys.argv[1], sys.argv[2],sys.argv[3], sys.argv[4])
+
+if len(sys.argv) == 5:
+    execute(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+else:
+    print("there should be 4 arguments, inputFile1, inputFile2, predicate, distance. Now there are ", len(sys.argv) - 1)
 exitCall()
