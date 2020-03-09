@@ -15,12 +15,12 @@ def execute(file, crs):
         ats = runProcessingMergeVectorLayers(vectorLayerArray, crs)
         getGeoJsonFromFeaturesOfOutput(ats)
     else:
-        print("Invalid crs: " + crs)
+        print("SCRIPT_ERROR Invalid crs: " + crs)
 
 
 if len(sys.argv) == 3:
     execute(sys.argv[1], sys.argv[2])
 else:
-    print("there should be 2 arguments, file, crs. Now there are", len(sys.argv) - 1)
+    print("SCRIPT_ERROR there should be 2 arguments, file, crs. Now there are", len(sys.argv) - 1)
 
 exitCall()

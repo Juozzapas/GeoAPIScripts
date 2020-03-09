@@ -16,7 +16,6 @@ sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
 from qgis.analysis import QgsNativeAlgorithms
 import processing
 from processing.core.Processing import Processing
-from tempfile import TemporaryFile
 
 Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
@@ -24,15 +23,6 @@ QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 
 # Write your code here to load some layers, use processing
 # algorithms, etc.
-
-def getLayersFromFile(path):
-    with open(path) as myFile:
-        text = myFile.read()
-    result = text.split('?')
-    for m in result:
-        TemporaryFile()
-    return "layerlList"
-
 
 def execute():
     if len(sys.argv) == 3:
@@ -43,9 +33,9 @@ def execute():
 
         features = vl1.getFeatures()
         exporter = QgsJsonExporter()
-        print("GEOJSON", exporter.exportFeatures(features))
+        print("RESULT_GEOJSON", exporter.exportFeatures(features))
     else:
-        print("wrong parameters", len(sys.argv))
+        print("SCRIPT_ERROR wrong parameters", len(sys.argv))
 
 def runProcessingNativeBuffer(layer, distance):
     return processing.run("native:buffer",
@@ -85,19 +75,19 @@ def getGeoJsonFromFeaturesOfOutput(output):
     layer = output['OUTPUT']
     features = layer.getFeatures()
     exporter = QgsJsonExporter()
-    print("GEOJSON", exporter.exportFeatures(features))
+    print("RESULT_GEOJSON", exporter.exportFeatures(features))
 
 
 def getGeoJsonFromSelectedFeaturesInLayer(layer):
     features = layer.selectedFeatures()
     exporter = QgsJsonExporter()
-    print("GEOJSON", exporter.exportFeatures(features))
+    print("RESULT_GEOJSON", exporter.exportFeatures(features))
 
 
 def getGeoJsonFromFeaturesInLayer(layer):
     features = layer.getFeatures()
     exporter = QgsJsonExporter()
-    print("GEOJSON", exporter.exportFeatures(features))
+    print("RESULT_GEOJSON", exporter.exportFeatures(features))
 
 
 def getLayerFromFile(path):
@@ -132,7 +122,7 @@ def checkIfCrsValid(crs):
         else:
             return False
     except:
-        print("An exception occurred")
+        print("SCRIPT_ERROR An exception occurred")
         return False
 
 
