@@ -1,12 +1,11 @@
 import sys
 
-from functionModule import runProcessingQgisClip, getGeoJsonFromFeaturesOfOutput, exitCall
+from functionModule import ProcessingAlgorithms, getGeoJsonFromFeaturesOfOutput, exitCall
 
 
 def execute(firstGeoJsonFile, SeconGeoJsonFile):
-    ats = runProcessingQgisClip(firstGeoJsonFile, SeconGeoJsonFile)
+    ats = ProcessingAlgorithms.runProcessingQgisClip(firstGeoJsonFile, SeconGeoJsonFile)
     getGeoJsonFromFeaturesOfOutput(ats)
-
 
 if len(sys.argv) == 3:
     execute(sys.argv[1], sys.argv[2])

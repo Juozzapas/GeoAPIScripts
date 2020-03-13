@@ -3,6 +3,7 @@ import sys
 
 from qgis.core import QgsApplication, QgsJsonExporter, QgsVectorLayer, QgsCoordinateReferenceSystem
 
+print("dsdsdsd")
 # Supply path to qgis install location
 QgsApplication.setPrefixPath('C:/OSGEO4W1/apps/qgis', True)
 
@@ -17,6 +18,7 @@ from qgis.analysis import QgsNativeAlgorithms
 import processing
 from processing.core.Processing import Processing
 
+print("dsdsdsd")
 Processing.initialize()
 QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 
@@ -24,44 +26,53 @@ QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
 # Write your code here to load some layers, use processing
 # algorithms, etc.
 
-def execute():
-    if len(sys.argv) == 3:
+class ProcessingAlgorithms:
+    def runProcessingNativeBuffer(layer, distance):
+        return processing.run("native:buffer",
+                              {'INPUT': layer,
+                               'DISTANCE': distance, 'SEGMENTS': 5,
+                               'END_CAP_STYLE': 0, 'JOIN_STYLE': 0,
+                               'MITER_LIMIT': 2, 'DISSOLVE': False,
+                               'OUTPUT': "TEMPORARY_OUTPUT"})
 
-        ats = runProcessingNativeBuffer(sys.argv[1], sys.argv[2])
-        print(ats)
-        vl1 = ats['OUTPUT']
+    def runProcessingNativeIntersect(inputLayer, overlayLayer):
+        processing.algorithmHelp("native:intersection")
+        return processing.run("native:intersection",
+                              {'INPUT': inputLayer,
+                               'OVERLAY': overlayLayer,
+                               'INPUT_FIELDS': [],
+                               'OVERLAY_FIELDS': [],
+                               'OVERLAY_FIELDS_PREFIX': '',
+                               'OUTPUT': 'TEMPORARY_OUTPUT'})
 
-        features = vl1.getFeatures()
-        exporter = QgsJsonExporter()
-        print("RESULT_GEOJSON", exporter.exportFeatures(features))
-    else:
-        print("SCRIPT_ERROR wrong parameters", len(sys.argv))
+    def runProcessingNativeSelectByLocation(inputLayer, overlayLayer, predicate=[0]):
+        # processing.algorithmHelp("native:selectbylocation")
+        return processing.run("native:selectbylocation",
+                              {'INPUT': inputLayer,
+                               'PREDICATE': predicate,
+                               'INTERSECT': overlayLayer,
+                               'METHOD': 0})
 
-def runProcessingNativeBuffer(layer, distance):
-    return processing.run("native:buffer",
-                          {'INPUT': layer,
-                           'DISTANCE': distance, 'SEGMENTS': 5,
-                           'END_CAP_STYLE': 0, 'JOIN_STYLE': 0,
-                           'MITER_LIMIT': 2, 'DISSOLVE': False,
-                           'OUTPUT': "TEMPORARY_OUTPUT"})
+    def runProcessingQgisSelectByAttribute(input, field, operator, value):
+        return processing.run("qgis:selectbyattribute",
+                              {'INPUT': input,
+                               'FIELD': field,
+                               'OPERATOR': operator,
+                               'VALUE': value,
+                               'METHOD': 0})
 
-def runProcessingNativeIntersect(inputLayer, overlayLayer):
-    processing.algorithmHelp("native:intersection")
-    return processing.run("native:intersection",
-                          {'INPUT': inputLayer,
-                           'OVERLAY': overlayLayer,
-                           'INPUT_FIELDS': [],
-                           'OVERLAY_FIELDS': [],
-                           'OVERLAY_FIELDS_PREFIX': '',
-                           'OUTPUT': 'TEMPORARY_OUTPUT'})
+    def runProcessingQgisClip(inputLayer, overlayLayer):
+        return processing.run("native:clip",
+                              {'INPUT': inputLayer,
+                               'OVERLAY': overlayLayer,
+                               'OUTPUT': 'TEMPORARY_OUTPUT'})
 
-def runProcessingNativeSelectByLocation(inputLayer, overlayLayer, predicate=[0]):
-    # processing.algorithmHelp("native:selectbylocation")
-    return processing.run("native:selectbylocation",
-                          {'INPUT': inputLayer,
-                           'PREDICATE': predicate,
-                           'INTERSECT': overlayLayer,
-                           'METHOD': 0})
+    def runProcessingMergeVectorLayers(layerList, crs='None'):
+        return processing.run("native:mergevectorlayers",
+                              {'LAYERS': layerList,
+                               'CRS': crs,
+                               'OUTPUT': 'TEMPORARY_OUTPUT'})
+
 
 def isInt(object):
     try:
@@ -104,16 +115,6 @@ def isDistanceValid(distance):
 def exitCall():
     qgs.exitQgis()
 
-
-def runProcessingQgisSelectByAttribute(input, field, operator, value):
-    return processing.run("qgis:selectbyattribute",
-                          {'INPUT': input,
-                           'FIELD': field,
-                           'OPERATOR': operator,
-                           'VALUE': value,
-                           'METHOD': 0})
-
-
 def checkIfCrsValid(crs):
     try:
         QgsCrs = QgsCoordinateReferenceSystem(crs)
@@ -125,14 +126,6 @@ def checkIfCrsValid(crs):
         print("SCRIPT_ERROR An exception occurred")
         return False
 
-
-def runProcessingMergeVectorLayers(layerList, crs='None'):
-    return processing.run("native:mergevectorlayers",
-                          {'LAYERS': layerList,
-                           'CRS': crs,
-                           'OUTPUT': 'TEMPORARY_OUTPUT'})
-
-
 def getQgsVectorLayerArray(objectArray):
     vectorArray = []
     for object in objectArray:
@@ -140,10 +133,3 @@ def getQgsVectorLayerArray(objectArray):
         tempLayer = QgsVectorLayer(tempJsonObject, "mygeojson", "ogr")
         vectorArray.append(tempLayer)
     return vectorArray
-
-
-def runProcessingQgisClip(inputLayer, overlayLayer):
-    return processing.run("native:clip",
-                          {'INPUT': inputLayer,
-                           'OVERLAY': overlayLayer,
-                           'OUTPUT': 'TEMPORARY_OUTPUT'})

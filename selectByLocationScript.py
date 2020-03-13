@@ -1,20 +1,21 @@
 import sys
 
-from functionModule import getLayerFromFile, getGeoJsonFromSelectedFeaturesInLayer, exitCall, runProcessingNativeBuffer, \
-    isDistanceValid, runProcessingNativeSelectByLocation
+from functionModule import getLayerFromFile, getGeoJsonFromSelectedFeaturesInLayer, exitCall, isDistanceValid, \
+    ProcessingAlgorithms
 
 
 def execute(firstGeoJsonFile, SeconGeoJsonFile, predicate, distance):
     layer = getLayerFromFile(firstGeoJsonFile)
     if (isDistanceValid(distance)):
-        runProcessingNativeSelectByLocation(layer, bufferedLayer(SeconGeoJsonFile, distance), predicate)
+        ProcessingAlgorithms.runProcessingNativeSelectByLocation(layer, bufferedLayer(SeconGeoJsonFile, distance),
+                                                                 predicate)
     else:
-        runProcessingNativeSelectByLocation(layer, SeconGeoJsonFile)
+        ProcessingAlgorithms.runProcessingNativeSelectByLocation(layer, SeconGeoJsonFile)
     getGeoJsonFromSelectedFeaturesInLayer(layer)
 
 
 def bufferedLayer(pathToLayer, distance):
-    buffer = runProcessingNativeBuffer(pathToLayer, distance)
+    buffer = ProcessingAlgorithms.runProcessingNativeBuffer(pathToLayer, distance)
     return buffer['OUTPUT']
 
 

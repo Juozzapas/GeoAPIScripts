@@ -1,12 +1,11 @@
 import sys
 
-from functionModule import runProcessingNativeIntersect, getGeoJsonFromFeaturesOfOutput, exitCall
+from functionModule import ProcessingAlgorithms, getGeoJsonFromFeaturesOfOutput, exitCall
 
 
 def execute(firstGeoJsonFile, SeconGeoJsonFile):
-    ats = runProcessingNativeIntersect(firstGeoJsonFile, SeconGeoJsonFile)
+    ats = ProcessingAlgorithms.runProcessingNativeIntersect(firstGeoJsonFile, SeconGeoJsonFile)
     getGeoJsonFromFeaturesOfOutput(ats)
-
 
 if len(sys.argv) == 3:
     execute(sys.argv[1], sys.argv[2])

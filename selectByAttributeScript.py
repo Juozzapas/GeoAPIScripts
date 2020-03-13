@@ -1,12 +1,12 @@
 import sys
 
-from functionModule import runProcessingQgisSelectByAttribute, exitCall, getLayerFromFile, \
+from functionModule import ProcessingAlgorithms, exitCall, getLayerFromFile, \
     getGeoJsonFromSelectedFeaturesInLayer
 
 
 def execute(input, field, operator, value):
     layer = getLayerFromFile(input)
-    runProcessingQgisSelectByAttribute(layer, field, operator, value)
+    ProcessingAlgorithms.runProcessingQgisSelectByAttribute(layer, field, operator, value)
     getGeoJsonFromSelectedFeaturesInLayer(layer)
 
 

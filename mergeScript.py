@@ -1,7 +1,7 @@
 import json
 import sys
 
-from functionModule import runProcessingMergeVectorLayers, getGeoJsonFromFeaturesOfOutput, exitCall, \
+from functionModule import ProcessingAlgorithms, getGeoJsonFromFeaturesOfOutput, exitCall, \
     getQgsVectorLayerArray, checkIfCrsValid, isInt
 
 
@@ -12,7 +12,7 @@ def execute(file, crs):
         with open(file) as f:
             objectArray = json.loads(f.read())
         vectorLayerArray = getQgsVectorLayerArray(objectArray)
-        ats = runProcessingMergeVectorLayers(vectorLayerArray, crs)
+        ats = ProcessingAlgorithms.runProcessingMergeVectorLayers(vectorLayerArray, crs)
         getGeoJsonFromFeaturesOfOutput(ats)
     else:
         print("SCRIPT_ERROR Invalid crs: " + crs)
