@@ -4,7 +4,6 @@ import os
 from landFundEvaluationAndAnalysis.landFundModule import exitCall, \
     LandFundAnalysis,ResultAZ_PR10LT,ResultDIRV_DB10LT
 
-
 DIRV_DB10LTFilePath=os.path.join(os.getcwd(),"Data_sets\\vertinimas.shp")
 AZ_PR10LTFilePath=os.path.join(os.getcwd(),"Data_sets\\apleistos_zemes.shp")
 def main(args):
