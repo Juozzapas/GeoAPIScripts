@@ -1,6 +1,6 @@
 import sys
 
-from analysisFunctions.functionModule import ProcessingAlgorithms, LayerManipulation, exitCall
+from vectorAnalysis.vectorAnalysisModule import ProcessingAlgorithms, LayerManipulation, exitCall
 
 
 def main(args):
@@ -16,7 +16,7 @@ def execute(firstGeoJsonFile, SeconGeoJsonFile):
         layer = ProcessingAlgorithms.runProcessingQgisClip(firstGeoJsonFile, SeconGeoJsonFile)
         geoJson = LayerManipulation.getGeoJsonFromFeaturesFromLayer(layer)
     except:
-        print("SCRIPT_ERROR prosessing algorithm error")
+        print("SCRIPT_ERROR processing algorithm error")
     else:
         print("RESULT_GEOJSON", geoJson)
 

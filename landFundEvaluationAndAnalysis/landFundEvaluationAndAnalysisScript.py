@@ -1,9 +1,11 @@
 import sys
 import json
 
-from landFundEvaliationAndAnalysis.landFundModule import exitCall, \
-    LandFund
+from landFundEvaluationAndAnalysis.landFundModule import exitCall, \
+    LandFundAnalysis,ResultAZ_PR10LT,ResultDIRV_DB10LT
 
+DIRV_DB10LTFilePath="C:\\Users\\Username\\Desktop\\Analize\\vertinimas.shp"
+AZ_PR10LTFilePath="C:\\Users\\Username\\Desktop\\Analize\apleistos_zemes.shp"
 def main(args):
     if len(args) == 4:
         execute(args[1], args[2], args[3])
@@ -14,32 +16,30 @@ def main(args):
               len(args) - 1)
 
 def execute(firstGeoJsonFile, predicate, distance):
-    instance = LandFund()
+    instance = LandFundAnalysis()
     predicateList = predicate.split(',')
     x = {}
     if instance.isPredicateListValid(predicateList):
         layer = instance.prepareInputLayer(firstGeoJsonFile, distance)
         try:
             if '0' in predicateList:
-                answer = instance.analysisDIRV_DB10LT(layer,
-                                                      "C:\\Users\\Username\\Desktop\\New folder (2)\\vertinimas.shp")
+                answer = instance.startAnalyzis(layer,DIRV_DB10LTFilePath
+                                                      ,ResultDIRV_DB10LT())
                 x.update(DIRV_DB10LT=answer)
         except:
             x.update(DIRV_DB10LT="unableToCalculate")
         try:
             if '1' in predicateList:
-                answer = instance.analysisAZ_PR10LT(layer, "C:\\Users\\Username\\Desktop\\apleistos_zemes.shp")
+                answer = instance.startAnalyzis(layer,AZ_PR10LTFilePath,ResultAZ_PR10LT())
                 x.update(AZ_PR10LT=answer)
         except:
             x.update(AZ_PR10LT="unableToCalculate")
-        x = getJson(x)
+        x.update(baseAnalysis=instance.processInputLayer(layer))
+        x = json.dumps(x)
         print("RESULT_GEOJSON", x)
     else:
         print("SCRIPT_ERROR predicate list does not contain values representing existing operations")
-
-
-def getJson(str):
-    return json.dumps(str)
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
+exitCall()
 

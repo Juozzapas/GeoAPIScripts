@@ -1,15 +1,15 @@
 import sys
 
-from analysisFunctions.functionModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
+from vectorAnalysis.vectorAnalysisModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
 
 def execute(firstGeoJsonFile, SeconGeoJsonFile, predicate, distance):
-    if not Validation.isPredicateListValid(predicate):
+    if not Validation.isPredicateValid(predicate):
         print("SCRIPT_ERROR Incorrect parameter value for PREDICATE")
         return
     try:
         layer = LayerManipulation.getLayerFromFile(firstGeoJsonFile)
-        layer2 = LayerManipulation.getLayerFromFile(SeconGeoJsonFile)
-        if (Validation.isNumber(distance)):
+        layer2 = SeconGeoJsonFile
+        if Validation.isNumber(distance):
             layer2= ProcessingAlgorithms.runProcessingNativeBuffer(layer2, distance)
         ProcessingAlgorithms.runProcessingNativeSelectByLocation(layer, layer2, predicate)
     except:

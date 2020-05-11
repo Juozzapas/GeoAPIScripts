@@ -1,2 +1,0 @@
-# GeoAPIScripts
-Scripts for GeoAPI
