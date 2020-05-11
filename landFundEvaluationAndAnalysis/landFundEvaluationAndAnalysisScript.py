@@ -1,12 +1,14 @@
 import sys
 import json
-
+import os
 from landFundEvaluationAndAnalysis.landFundModule import exitCall, \
     LandFundAnalysis,ResultAZ_PR10LT,ResultDIRV_DB10LT
 
-DIRV_DB10LTFilePath="C:\\Users\\Username\\Desktop\\Analize\\vertinimas.shp"
-AZ_PR10LTFilePath="C:\\Users\\Username\\Desktop\\Analize\apleistos_zemes.shp"
+
+DIRV_DB10LTFilePath=os.path.join(os.getcwd(),"Data_sets\\vertinimas.shp")
+AZ_PR10LTFilePath=os.path.join(os.getcwd(),"Data_sets\\apleistos_zemes.shp")
 def main(args):
+
     if len(args) == 4:
         execute(args[1], args[2], args[3])
     elif len(args) == 3:
