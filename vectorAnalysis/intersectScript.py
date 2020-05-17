@@ -1,6 +1,6 @@
 import sys
 
-from analysisFunctions.functionModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
+from vectorAnalysis.vectorAnalysisModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
 
 
 def main(args):

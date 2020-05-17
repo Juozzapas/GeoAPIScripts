@@ -1,7 +1,7 @@
 import json
 import sys
 
-from analysisFunctions.functionModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
+from vectorAnalysis.vectorAnalysisModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
 
 
 def execute(file, crs):
@@ -17,7 +17,7 @@ def execute(file, crs):
             ats = ProcessingAlgorithms.runProcessingQgisDeleteColumn(ats,['layer','path'])
             geoJson = LayerManipulation.getGeoJsonFromFeaturesOfOutput(ats)
         except Exception as s:
-            print("SCRIPT_ERROR prosessing algorithm error" + str(s))
+            print("SCRIPT_ERROR processing algorithm error" + str(s))
         else:
             print("RESULT_GEOJSON", geoJson)
 

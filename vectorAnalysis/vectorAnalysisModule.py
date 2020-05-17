@@ -48,6 +48,7 @@ class ProcessingAlgorithms:
 
     def runProcessingNativeSelectByLocation(inputLayer, overlayLayer, predicate):
         # processing.algorithmHelp("native:selectbylocation")
+        print(inputLayer.crs())
         rez = processing.run("native:selectbylocation",
                              {'INPUT': inputLayer,
                               'PREDICATE': predicate,
@@ -142,7 +143,7 @@ class LayerManipulation:
 
 class Validation:
     def isSelectedFeaturesEmpty(layer):
-        if (layer.selectedFeatureCount() == 0):
+        if layer.selectedFeatureCount() == 0:
             return True
         return False
 
@@ -177,7 +178,7 @@ class Validation:
         except ValueError:
             return False
 
-    def isPredicateListValid(predicate):
+    def isPredicateValid(predicate):
         try:
             x = predicate.split(',')
             for number in x:

@@ -3,7 +3,7 @@ import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch, MagicMock
 
-from landFundEvaliationAndAnalysis import landFundEvaluationAndAnalysisScript
+from landFundEvaluationAndAnalysis import landFundEvaluationAndAnalysisScript
 
 
 def createFeatures():
@@ -16,6 +16,8 @@ def createFeatures():
 def dummy_function(value):
     "Will return same value as value passed to the function"
     return value
+
+
 class TestAnalysis(unittest.TestCase):
 
     def setUp(self):
@@ -28,66 +30,83 @@ class TestAnalysis(unittest.TestCase):
         with redirect_stdout(self.f):
             self.instance.main(args)
         s = self.f.getvalue()
-        self.assertIn("SCRIPT_ERROR", s)
-
+        self.assertIn(
+            "SCRIPT_ERROR there should be 2 or 3 arguments, inputFilePath, distance, predicate (optional). Now there are",
+            s)
 
     def test_Main(self):
-        args= [None,None,"array",None]
-        self.instance.execute= MagicMock(return_value=None)
+        args = [None, None, "array", None]
+        self.instance.execute = MagicMock(return_value=None)
         with redirect_stdout(self.f):
             self.instance.main(args)
         s = self.f.getvalue()
         self.assertEqual("", s)
 
-
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    @patch('landFundEvaliationAndAnalysis.analysisScript.json.dumps', MagicMock(side_effect=dummy_function))
-    def test_Execute(self, MockClass1):
-        with redirect_stdout(self.f):
-            self.instance.execute(None,"0,1",None)
-        s = self.f.getvalue()
-        self.assertIn("DIRV_DB10LT", s)
-
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    def test_ExecuteEmpty(self, MockClass1):
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'isPredicateListValid', MagicMock(return_value=False))
+    def test_ExecuteInvalidPredicateList(self):
         with redirect_stdout(self.f):
             self.instance.execute(None, "", None)
         s = self.f.getvalue()
         self.assertNotIn("DIRV_DB10LT", s)
         self.assertNotIn("AZ_PR10LT", s)
+        self.assertIn("SCRIPT_ERROR predicate list does not contain values representing existing operations", s)
 
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    @patch('landFundEvaliationAndAnalysis.analysisScript.json.dumps', MagicMock(side_effect=dummy_function))
-    def test_ExecutePredicateDIRV_DV10LT(self, MockClass1):
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'isPredicateListValid', MagicMock(return_value=True))
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'prepareInputLayer', MagicMock())
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'processInputLayer', MagicMock())
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.json.dumps',
+           MagicMock(side_effect=dummy_function))
+    def test_Execute(self):
         with redirect_stdout(self.f):
             self.instance.execute(None, "0", None)
         s = self.f.getvalue()
-        self.assertIn("DIRV_DB10LT", s)
+        self.assertIn("RESULT_GEOJSON", s)
 
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    @patch('landFundEvaliationAndAnalysis.analysisScript.json.dumps', MagicMock(side_effect=dummy_function))
-    def test_ExecutePredicateAZ_PR10LT(self, MockClass1):
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.LandFundAnalysis')
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.json.dumps',
+           MagicMock(side_effect=dummy_function))
+    def test_ExecuteDIRV_DR10LaandAZ_PR10LT(self, MockClass):
         with redirect_stdout(self.f):
-            self.instance.execute(None,"1", None )
+            self.instance.execute(None, "0,1", None)
         s = self.f.getvalue()
-        self.assertIn("AZ_PR10LT", s)
+        self.assertIn("DIRV_DR10LT", s)
+        self.assertIn("AZ_DR10LT", s)
 
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    def test_ExecuteUnableToCalculateDIRV_DV10LT(self, MockClass1):
-        MockClass1.return_value.analysisDIRV_DB10LT.side_effect = Exception('foo')
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.LandFundAnalysis')
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.json.dumps',
+           MagicMock(side_effect=dummy_function))
+    def test_ExecuteUnableToCalculateDIRV_DV10LT(self, MockClass):
+        MockClass.return_value.startAnalyzis.side_effect = Exception('foo')
         with redirect_stdout(self.f):
             self.instance.execute(None, "0", None)
         s = self.f.getvalue()
+        self.assertIn("DIRV_DR10LT", s)
         self.assertIn("unableToCalculate", s)
 
-    @patch('landFundEvaliationAndAnalysis.analysisScript.ProcessingAlgorithms')
-    def test_ExecuteUnableToCalculateAZ_PR10LT(self, MockClass1):
-        MockClass1.return_value.analysisAZ_PR10LT.side_effect = KeyError('foo')
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.LandFundAnalysis')
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'processInputLayer', MagicMock())
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.json.dumps',
+           MagicMock(side_effect=dummy_function))
+    def test_ExecuteUnableToCalculateAZ_PR10LT(self, MockClass):
+        MockClass.return_value.startAnalyzis.side_effect = KeyError('foo')
         with redirect_stdout(self.f):
-            self.instance.execute(None, "1" ,None)
+            self.instance.execute(None, "1", None)
         s = self.f.getvalue()
+        self.assertIn("AZ_DR10LT", s)
         self.assertIn("unableToCalculate", s)
 
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.LandFundAnalysis')
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'processInputLayer', MagicMock())
+    @patch('landFundEvaluationAndAnalysis.landFundEvaluationAndAnalysisScript.json.dumps',
+           MagicMock(side_effect=dummy_function))
+    @patch.object(landFundEvaluationAndAnalysisScript.LandFundAnalysis, 'isPredicateListValid', MagicMock(return_value=True))
+    def test_BaseAnalysisResult(self, MockClass):
+        with redirect_stdout(self.f):
+            self.instance.execute(None, "", None)
+        s = self.f.getvalue()
+        self.assertNotIn("AZ_DR10LT", s)
+        self.assertNotIn("DIRV_DR10LT", s)
+        self.assertIn("baseAnalysis", s)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,6 @@
 import sys
 
-from analysisFunctions.functionModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
-
+from vectorAnalysis.vectorAnalysisModule import ProcessingAlgorithms, LayerManipulation, Validation, exitCall
 
 def main(args):
     if len(args) == 3:
@@ -18,7 +17,7 @@ def execute(firstGeoJsonFile, distance):
             layer = ProcessingAlgorithms.runProcessingNativeBuffer(firstGeoJsonFile, distance)
             geoJson = LayerManipulation.getGeoJsonFromFeaturesFromLayer(layer)
         except Exception as e:
-            print("SCRIPT_ERROR prosessing algorithm error" + str(e))
+            print("SCRIPT_ERROR processing algorithm error" + str(e))
         else:
             print("RESULT_GEOJSON", geoJson)
     else:
